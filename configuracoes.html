@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações | PSI-GRO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper"><i class="fa-solid fa-brain"></i> <span class="logo-text">PSI-GRO</span></div>
+            <button class="toggle-btn" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <ul class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            <a href="inventario.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Inventário de Riscos</span></a>
+            <a href="planos-acao.html" class="nav-item"><i class="fa-solid fa-tasks"></i> <span>Planos de Ação</span></a>
+            <a href="relatorios.html" class="nav-item"><i class="fa-solid fa-file-pdf"></i> <span>Relatórios AEP</span></a>
+            <a href="configuracoes.html" class="nav-item active"><i class="fa-solid fa-cog"></i> <span>Configurações</span></a>
+            <a href="#" class="nav-item" style="margin-top: auto; color: #ef4444;" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Sair do Sistema</span>
+            </a>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="header-left"><h2>Configurações do Sistema</h2></div>
+            <div class="user-info"><span><i class="fa-solid fa-user-tie"></i> <span id="userNameDisplay">Gestor | Perone</span></span></div>
+        </header>
+
+        <div class="dashboard-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
+
+            <div class="panel" style="grid-column: span 2;">
+           <div class="panel-title">Dados da Empresa (Cabeçalho do PGR)</div>
+           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+               <div class="form-group">
+                   <label>Razão Social / Nome da Empresa:</label>
+                   <input type="text" id="empresaNome" placeholder="Ex: Indústria Tech S/A">
+               </div>
+               <div class="form-group">
+                   <label>CNPJ:</label>
+                   <input type="text" id="empresaCnpj" placeholder="00.000.000/0001-00">
+               </div>
+               <div class="form-group">
+                   <label>Quantidade Total de Funcionários:</label>
+                   <input type="number" id="empresaFunc" placeholder="Ex: 150">
+               </div>
+               <div class="form-group">
+                   <label>Logomarca (Opcional):</label>
+                   <input type="file" id="empresaLogoFile" accept="image/*" onchange="converterImagemBase64(this)">
+                   <img id="previewLogo" src="" style="max-height: 40px; margin-top: 10px; display: none;">
+               </div>
+           </div>
+           <button class="btn-primary" onclick="salvarDadosEmpresa()" style="width: 100%;">
+               <i class="fa-solid fa-building"></i> Salvar Dados da Empresa
+           </button>
+       </div>
+
+            <div class="panel">
+                <div class="panel-title">Setores da Empresa</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="novoSetor" placeholder="Nome do setor..." style="flex: 1; padding: 8px; border: 1px solid var(--border);">
+                    <button class="btn-primary" onclick="addSetor()"><i class="fa-solid fa-plus"></i> Add</button>
+                </div>
+                <ul id="listaSetores" style="list-style: none; display: flex; flex-direction: column; gap: 10px;"></ul>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Fatores de Risco Padronizados (NR-1)</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="novoPerigoNome" placeholder="Ex: Assédio Moral" style="flex: 1; padding: 8px; border: 1px solid var(--border);">
+                    <!-- ICONES DOS TIPOS DE RISCOS NAS CONFIGURACOES -->
+<select id="novoPerigoIcone" style="padding: 8px; border: 1px solid var(--border);">
+    <option value="🧠">🧠 Mental / Cognitivo</option>
+    <option value="⏱️">⏱️ Tempo / Ritmo</option>
+    <option value="👥">👥 Relações / Conflitos</option>
+    <option value="📢">📢 Assédio / Violência</option>
+    <option value="💔">💔 Emocional / Burnout</option>
+    <option value="⚖️">⚖️ Conflito Trabalho-Família</option>
+    <option value="🏢">🏢 Gestão / Autonomia</option>
+    <option value="🔥">🔥 Risco Físico / Acidente</option>
+    <option value="☢️">☢️ Risco Químico</option>
+    <option value="🦠">🦠 Risco Biológico</option>
+    <option value="🧍‍♂️">🧍‍♂️ Risco Ergonômico</option>
+    <option value="⚠️">⚠️ Alerta Geral</option>
+    <option value="💼">💼 Sobrecarga Administrativa</option>
+    <option value="🎯">🎯 Pressão por Metas</option>
+</select>
+                    <button class="btn-primary" onclick="addFatorRisco()">+ Add</button>
+                </div>
+                <ul id="listaFatoresRisco" style="list-style: none; display: flex; flex-direction: column; gap: 10px;"></ul>
+            </div>
+
+            <div class="panel" style="grid-column: span 2;">
+                <div class="panel-title">Critérios da Avaliação e Gravidade das Respostas</div>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Título da Pergunta:</label>
+                        <input type="text" id="perguntaTexto" placeholder="Ex: Como você avalia a sobrecarga de trabalho?">
+                    </div>
+
+                    <!-- ADICIONE ESTE NOVO BLOCO AQUI -->
+               <div class="form-group" style="margin-top: 10px;">
+                   <label>Categoria de Risco / Tipo de Estresse (Correlação Automática):</label>
+                   <select id="perguntaCategoria" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); width: 100%;">
+        <option value="🧠|Exigências Cognitivas">🧠 Exigências Cognitivas (Sobrecarga mental, Foco extremo)</option>
+        <option value="⏱️|Organização e Ritmo">⏱️ Organização e Ritmo (Jornada, Metas, Pressão de tempo)</option>
+        <option value="👥|Relações Socioprofissionais">👥 Relações Socioprofissionais (Clima, Conflitos, Isolamento)</option>
+        <option value="📢|Violência e Assédio">📢 Violência e Assédio (Moral, Sexual, Discriminação)</option>
+        <option value="💔|Impacto Emocional e Burnout">💔 Impacto Emocional e Burnout (Ansiedade, Fadiga, Exaustão)</option>
+        <option value="⚖️|Conflito Trabalho-Família">⚖️ Conflito Trabalho-Família (Desequilíbrio vida pessoal/profissional)</option>
+        <option value="🏢|Gestão e Autonomia">🏢 Gestão e Autonomia (Insegurança, Falta de controle, Injustiça)</option>
+                   </select>
+               </div>
+                <!-- FIM DO NOVO BLOCO -->
+                    
+                    <div style="display: flex; gap: 10px; align-items: flex-end; margin-top: 10px;">
+                        <div style="flex: 2;">
+                            <label style="font-size: 0.8rem;">Texto da Opção:</label>
+                            <input type="text" id="opcaoTexto" placeholder="Ex: Muito Alta">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem;">Peso/Gravidade (1 a 5):</label>
+                            <select id="opcaoPeso">
+                                <option value="1">1 (Risco Irrelevante)</option>
+                                <option value="2">2 (Risco Baixo)</option>
+                                <option value="3">3 (Risco Moderado)</option>
+                                <option value="4">4 (Risco Alto)</option>
+                                <option value="5">5 (Risco Crítico)</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary btn-outline" onclick="addOpcaoTemp()" style="height: 38px;">+ Opção</button>
+                    </div>
+
+                    <div id="listaOpcoesTemp" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
+
+                    <button class="btn-primary" style="margin-top: 20px; width: 100%;" onclick="salvarPerguntaCompleta()">
+                        <i class="fa-solid fa-save"></i> SALVAR PERGUNTA NO SISTEMA
+                    </button>
+                </div>
+                
+                <div id="listaPerguntas" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+            </div>
+
+        </div>
+    </main>
+
+    
+
+
+
+    <script>
+        let opcoesTemporarias = [];
+
+        document.addEventListener('DOMContentLoaded', () => { renderizarConfig(); });
+
+        function renderizarConfig() {
+            const setores = getSetoresConfig();
+            let fatores = JSON.parse(localStorage.getItem('psi_gro_fatores')) || [];
+            const perguntas = getPerguntasConfig();
+
+            // --- SEED DE FATORES PADRÃO ---
+            // Se for a primeira vez e não houver fatores, carrega os seus antigos como padrão
+            if (fatores.length === 0) {
+                fatores = [
+                    { icone: '🧠', nome: 'Exigências Cognitivas' },
+                    { icone: '⏱️', nome: 'Organização e Ritmo' },
+                    { icone: '👥', nome: 'Relações Socioprofissionais' },
+                    { icone: '📢', nome: 'Violência e Assédio' },
+                    { icone: '💔', nome: 'Impacto Emocional e Burnout' },
+                    { icone: '⚖️', nome: 'Conflito Trabalho-Família' },
+                    { icone: '🏢', nome: 'Gestão e Autonomia' }
+                ];
+                localStorage.setItem('psi_gro_fatores', JSON.stringify(fatores));
+            }
+
+            // --- 1. RENDERIZAR SETORES NA TELA ---
+            const listSetores = document.getElementById('listaSetores');
+            if (listSetores) {
+                listSetores.innerHTML = setores.map((s, index) => `
+                    <li class="card-mini">
+                        <span><i class="fa-solid fa-layer-group" style="color:var(--text-light); margin-right:8px;"></i> ${s}</span>
+                        <i class="fa-solid fa-trash" onclick="removerSetor(${index})" style="color:#ef4444; cursor:pointer;" title="Remover Setor"></i>
+                    </li>
+                `).join('');
+            }
+
+            // --- 2. RENDERIZAR FATORES DE RISCO CRIADOS NA TELA ---
+            const listFatores = document.getElementById('listaFatoresRisco');
+            if (listFatores) {
+                listFatores.innerHTML = fatores.map((f, index) => `
+                    <li class="card-mini">
+                        <span style="font-weight: 500;">${f.icone} ${f.nome}</span>
+                        <i class="fa-solid fa-trash" onclick="removerFator(${index})" style="color:#ef4444; cursor:pointer;" title="Remover Fator"></i>
+                    </li>
+                `).join('');
+            }
+
+            // --- 3. SINCRONIZAR OS FATORES COM O SELECT DE CRIAR PERGUNTAS ---
+            const selectCategoria = document.getElementById('perguntaCategoria');
+            if (selectCategoria) {
+                // Ele pega a lista de fatores que renderizou em cima e injeta aqui como opções
+                selectCategoria.innerHTML = fatores.map(f => 
+                    `<option value="${f.icone}|${f.nome}">${f.icone} ${f.nome}</option>`
+                ).join('');
+            }
+
+            // --- 4. RENDERIZAR PERGUNTAS JÁ CADASTRADAS ---
+            const listPer = document.getElementById('listaPerguntas');
+            if(listPer) {
+                listPer.innerHTML = perguntas.map((p) => {
+                    const [icone, nomeCat] = (p.categoria || '🧠|Geral').split('|');
+                    return `
+                    <div class="panel" style="margin-bottom:0">
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.9rem">
+                            <span style="color: #3b82f6;">${icone} [${nomeCat}] <span style="color: var(--text-color);">${p.texto}</span></span>
+                            <i class="fa-solid fa-trash" onclick="removerPergunta('${p.id}')" style="color:#ef4444; cursor:pointer" title="Remover Pergunta"></i>
+                        </div>
+                        <ul style="margin-top:10px; font-size:0.8rem; color:var(--text-light); list-style-type: disc; margin-left: 20px;">
+                            ${p.opcoes.map(o => `<li>${o.texto} (Peso: ${o.peso})</li>`).join('')}
+                        </ul>
+                    </div>
+                    `;
+                }).join('');
+            }
+        }
+
+
+
+        // Funções de Gestão
+        function addOpcaoTemp() {
+            const txt = document.getElementById('opcaoTexto').value;
+            const peso = document.getElementById('opcaoPeso').value;
+            if(!txt) return;
+            opcoesTemporarias.push({ texto: txt, peso: parseInt(peso) });
+            document.getElementById('opcaoTexto').value = '';
+            renderizarListaTemp();
+        }
+
+        function renderizarListaTemp() {
+            document.getElementById('listaOpcoesTemp').innerHTML = opcoesTemporarias.map((o, i) => `
+                <span class="badge" style="background:#e2e8f0; color:#475569; padding:8px">
+                    ${o.texto} (${o.peso}) <i class="fa-solid fa-xmark" onclick="opcoesTemporarias.splice(${i},1);renderizarListaTemp()" style="cursor:pointer;margin-left:5px"></i>
+                </span>
+            `).join('');
+        }
+
+       function salvarPerguntaCompleta() {
+      const texto = document.getElementById('perguntaTexto').value;
+     const categoria = document.getElementById('perguntaCategoria').value; // Captura a categoria
+    
+     if(!texto || opcoesTemporarias.length === 0) return alert("Pergunta sem texto ou sem opções!");
+    
+      const perguntas = getPerguntasConfig();
+     // Salva a categoria junto com a pergunta no banco de dados
+    perguntas.push({ id: 'p' + Date.now(), texto, categoria, opcoes: opcoesTemporarias });
+    salvarPerguntasConfig(perguntas);
+    
+    opcoesTemporarias = [];
+    document.getElementById('perguntaTexto').value = '';
+    document.getElementById('listaOpcoesTemp').innerHTML = '';
+    renderizarConfig();
+}
+
+        function addSetor() {
+            const val = document.getElementById('novoSetor').value;
+            if(!val) return;
+            const s = getSetoresConfig(); s.push(val); salvarSetoresConfig(s);
+            document.getElementById('novoSetor').value = ''; renderizarConfig();
+        }
+
+        function removerSetor(i) {
+            const s = getSetoresConfig(); s.splice(i, 1); salvarSetoresConfig(s); renderizarConfig();
+        }
+
+        function addFatorRisco() {
+            const nome = document.getElementById('novoPerigoNome').value;
+            const icone = document.getElementById('novoPerigoIcone').value;
+            if(!nome) return;
+            const f = JSON.parse(localStorage.getItem('psi_gro_fatores')) || [];
+            f.push({ nome, icone });
+            localStorage.setItem('psi_gro_fatores', JSON.stringify(f));
+            document.getElementById('novoPerigoNome').value = ''; renderizarConfig();
+        }
+
+        function removerFator(i) {
+            const f = JSON.parse(localStorage.getItem('psi_gro_fatores')) || [];
+            f.splice(i, 1); localStorage.setItem('psi_gro_fatores', JSON.stringify(f)); renderizarConfig();
+        }
+
+        function removerPergunta(id) {
+            const p = getPerguntasConfig().filter(x => x.id !== id);
+            salvarPerguntasConfig(p); renderizarConfig();
+        }
+
+
+
+
+        // Adicione junto com suas funções do configuracoes.html
+function converterImagemBase64(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('previewLogo');
+            img.src = e.target.result;
+            img.style.display = 'block';
+            img.setAttribute('data-base64', e.target.result); // Salva o código da imagem
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function salvarDadosEmpresa() {
+    const preview = document.getElementById('previewLogo');
+    const logoImg = preview.getAttribute('data-base64') || preview.src;
+    
+    const config = {
+        nome: document.getElementById('empresaNome').value,
+        cnpj: document.getElementById('empresaCnpj').value,
+        func: document.getElementById('empresaFunc').value,
+        logo: logoImg.length > 200 ? logoImg : '' // Garante que é um base64 real
+    };
+    localStorage.setItem('psi_gro_empresa', JSON.stringify(config));
+    alert("Dados da empresa salvos para o PGR!");
+}
+
+// Adicione isso DENTRO da sua função renderizarConfig() para carregar os dados ao abrir a tela
+const emp = JSON.parse(localStorage.getItem('psi_gro_empresa')) || {};
+if(document.getElementById('empresaNome')) {
+    document.getElementById('empresaNome').value = emp.nome || '';
+    document.getElementById('empresaCnpj').value = emp.cnpj || '';
+    document.getElementById('empresaFunc').value = emp.func || '';
+    if(emp.logo) {
+        document.getElementById('previewLogo').src = emp.logo;
+        document.getElementById('previewLogo').style.display = 'block';
+        document.getElementById('previewLogo').setAttribute('data-base64', emp.logo);
+    }
+}
+
+
+
+    </script>
+
+    <style>
+        .card-mini { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; }
+    </style>
+
+
+
+<script src="js-cerebro.js"></script>
+</body>
+</html>

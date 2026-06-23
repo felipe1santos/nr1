@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSI-GRO | Dashboard AEP</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper"><i class="fa-solid fa-brain"></i> <span class="logo-text">PSI-GRO</span></div>
+            <button class="toggle-btn" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <ul class="nav-menu">
+            <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            <a href="inventario.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Inventário de Riscos</span></a>
+            <a href="planos-acao.html" class="nav-item"><i class="fa-solid fa-tasks"></i> <span>Planos de Ação</span></a>
+            <a href="relatorios.html" class="nav-item"><i class="fa-solid fa-file-pdf"></i> <span>Relatórios AEP</span></a>
+            <a href="configuracoes.html" class="nav-item"><i class="fa-solid fa-cog"></i> <span>Configurações</span></a>
+            <a href="#" class="nav-item" style="margin-top: auto; color: #ef4444;" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Sair do Sistema</span>
+            </a>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="header-left">
+                <h2>Painel de Controle NR-1</h2>
+            </div>
+            <div class="user-info"><span><i class="fa-solid fa-user-tie"></i> <span id="userNameDisplay">Gestor | Perone</span></span></div>
+        </header>
+
+        <div class="dashboard-container">
+            
+            <div style="background: var(--white); padding: 15px 20px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+    <label style="font-weight: bold; font-size: 0.9rem;"><i class="fa-solid fa-filter"></i> Filtros do Painel:</label>
+    
+    <select id="filtroGlobal" onchange="aplicarFiltroDashboard()" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); min-width: 180px;">
+        <option value="Todos">Todos os Setores</option>
+    </select>
+
+    <select id="filtroAvaliacao" onchange="aplicarFiltroDashboard()" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); min-width: 180px;">
+        <option value="Todas">Todas as Avaliações (Evolução)</option>
+    </select>
+
+    <select id="filtroData" onchange="aplicarFiltroDashboard()" style="padding: 8px; border-radius: 4px; border: 1px solid var(--border); min-width: 180px;">
+        <option value="Todo" selected>Todo o Período</option>
+        <option value="30d">Últimos 30 Dias</option>
+        <option value="90d">Últimos 3 Meses</option>
+    </select>
+    </div>
+
+            <!-- HTML ATUALIZADO: index.html -->
+            <!-- HTML ATUALIZADO: index.html -->
+<div class="kpi-row" style="grid-template-columns: repeat(4, 1fr);">
+    
+    <div class="kpi-card">
+        <div class="kpi-data">
+            <h3>Riscos Mapeados (Total)</h3>
+            <div style="display: flex; align-items: baseline;">
+                <div class="value" id="kpi-total" style="color: var(--text-main);">0</div>
+                <div id="trend-total"></div> <!-- Aqui entra a setinha -->
+            </div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-clipboard-list" style="color: #cbd5e1;"></i></div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-data">
+            <h3>Riscos Críticos / Extremos</h3>
+            <div style="display: flex; align-items: baseline;">
+                <!-- Removida a cor vermelha, mantendo a cor principal (preto/cinza escuro) -->
+                <div class="value" id="kpi-criticos" style="color: var(--text-main);">0</div>
+                <div id="trend-criticos"></div> <!-- Aqui entra a setinha -->
+            </div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i></div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-data">
+            <h3>Planos de Ação Pendentes</h3>
+            <div style="display: flex; align-items: baseline;">
+                <!-- Removida a cor laranja, mantendo a cor principal (preto/cinza escuro) -->
+                <div class="value" id="kpi-pendentes" style="color: var(--text-main);">0</div>
+                <div id="trend-pendentes"></div> <!-- Aqui entra a setinha -->
+            </div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-clipboard-check" style="color: #cbd5e1;"></i></div>
+    </div>
+
+    <!-- NOVO CARD: PLANOS CONCLUÍDOS -->
+    <div class="kpi-card">
+        <div class="kpi-data">
+            <h3>Planos de Ação Concluídos</h3>
+            <div style="display: flex; align-items: baseline;">
+                <!-- Mantida a cor verde (sucesso) -->
+                <div class="value" id="kpi-concluidos" style="color: #10b981;">0</div>
+                <div id="trend-concluidos"></div> <!-- Aqui entra a setinha -->
+            </div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-check-double" style="color: #10b981;"></i></div>
+    </div>
+
+</div>
+
+            <!-- NOVA DISTRIBUIÇÃO EM 3 COLUNAS -->
+            <!-- BLOCO ÚNICO DE MAPEAMENTO (3 Gráficos Juntos) -->
+            <div class="panel" style="margin-top: 20px; padding: 25px;">
+                <div class="panel-title" style="margin-bottom: 25px;">Visão Geral do Mapeamento de Riscos</div>
+                
+                <div style="display: grid; grid-template-columns: 1.1fr 1.2fr 1.3fr; gap: 30px; width: 100%; align-items: start;">
+                    
+                    <!-- COLUNA 1: MATRIZ DE RISCO -->
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 0.95rem; font-weight: bold; color: var(--sidebar-bg); margin-bottom: 20px; text-align: center;">Distribuição de Risco Ocupacional</div>
+                        <div class="matrix-legend-group" style="justify-content: center; gap: 15px;">
+                            <div class="matrix-container">
+                                <div class="matrix-grid" id="riskMatrix"></div>
+                            </div>
+                            <div class="legend-box">
+                                <div class="legend-item"><div class="legend-color bg-low"></div> Baixo (1-4)</div>
+                                <div class="legend-item"><div class="legend-color bg-mod"></div> Mod. (5-9)</div>
+                                <div class="legend-item"><div class="legend-color bg-high"></div> Alto (10-14)</div>
+                                <div class="legend-item"><div class="legend-color bg-crit"></div> Crítico (15-19)</div>
+                                <div class="legend-item"><div class="legend-color bg-ext"></div> Extremo (20-25)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 2: RADAR DE SETORES (AGORA MAIOR) -->
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                        <div style="font-size: 0.95rem; font-weight: bold; color: var(--sidebar-bg); margin-bottom: 5px; text-align: center;">Riscos por Setor (Carga Bruta)</div>
+                        <!-- O !important destrava o tamanho antigo do CSS -->
+                        <div class="radar-container" style="width: 100% !important; height: 320px !important; max-width: 100%; position: relative; margin: 0 auto;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 3: GRÁFICO VERTICAL (CATEGORIAS) -->
+                    <div style="display: flex; flex-direction: column; width: 100%;">
+                        <div style="font-size: 0.95rem; font-weight: bold; color: var(--sidebar-bg); margin-bottom: 5px; text-align: center;">Nível de Risco por Categoria</div>
+                        <div style="height: 320px; width: 100%; position: relative;">
+                            <canvas id="barChartCategorias"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="middle-row">
+                <div class="panel">
+                    <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+                     <span><i class="fa-solid fa-chart-line"></i> Evolução de Riscos Críticos/Extremos</span>
+    
+                     <!-- NOVO FILTRO DEDICADO DO GRÁFICO -->
+                     <select id="filtroSetorGrafico" onchange="atualizarGraficoEvolucaoLocal()" style="font-size: 0.8rem; padding: 5px; border-radius: 4px; border: 1px solid var(--border); font-weight: normal; color: var(--text-main); cursor: pointer; max-width: 200px;">
+                         <option value="Todos">Todos os Setores (Linhas)</option>
+                      </select>
+                    </div>
+
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="lineChartEvolucao"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">Ações Rápidas</div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="window.location.href='relatorios.html'">
+                            <i class="fa-solid fa-play"></i> INICIAR NOVA AVALIAÇÃO
+                        </button>
+                        <button class="btn-primary btn-outline" onclick="abrirModalImpressao()">
+                            <i class="fa-solid fa-file-export"></i> GERAR RELATÓRIO AEP / PGR
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-light);">
+                        <p><i class="fa-solid fa-check-circle" style="color: #16a34a;"></i> Em conformidade com a Portaria MTE nº 1.419/2024</p>
+                    </div>
+
+                    <!-- NOVO: CONTAINER DAS MINIATURAS DE RELATÓRIOS -->
+                    <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--sidebar-bg); margin-bottom: 10px;">Últimos Relatórios:</div>
+                        <div id="container-mini-relatorios" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                            <!-- O JavaScript vai desenhar os documentozinhos aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Últimos Perigos Psicossociais Mapeados no Inventário</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Setor</th>
+                                <th>Perigo Identificado (NR-1)</th>
+                                <th>Gravidade (P*S)</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-inventario">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Carrega Setores no Filtro Global e no Filtro do Gráfico
+    const filtroSetorGlobal = document.getElementById('filtroGlobal');
+    const filtroSetorGrafico = document.getElementById('filtroSetorGrafico');
+    
+    const setores = JSON.parse(localStorage.getItem('psi_gro_setores')) || ["Produção", "Vendas", "Administrativo", "Logística", "Outros"];
+    
+    setores.forEach(s => { 
+        if(filtroSetorGlobal) filtroSetorGlobal.innerHTML += `<option value="${s}">${s}</option>`; 
+        if(filtroSetorGrafico) filtroSetorGrafico.innerHTML += `<option value="${s}">${s} (Colunas)</option>`; 
+    });
+
+    // 2. Carrega Avaliações Dinamicamente no Filtro de Data
+    const filtroAv = document.getElementById('filtroAvaliacao');
+    const avaliacoes = JSON.parse(localStorage.getItem('psi_gro_avaliacoes')) || [];
+    avaliacoes.forEach(av => { 
+        if(filtroAv) filtroAv.innerHTML += `<option value="${av.id}">${av.titulo}</option>`; 
+    });
+});
+
+// 3. FUNÇÃO QUE ACIONA A MUDANÇA DO GRÁFICO
+function atualizarGraficoEvolucaoLocal() {
+    const setorSelecionado = document.getElementById('filtroSetorGrafico').value;
+    const filtroAvaliacaoGlobal = document.getElementById('filtroAvaliacao') ? document.getElementById('filtroAvaliacao').value : 'Todas';
+    
+    // Chama a função que criamos no js-dashboard passando o filtro local
+    renderizarGraficoEvolucao(setorSelecionado, filtroAvaliacaoGlobal);
+}
+</script>
+
+
+
+    <div class="modal-overlay" id="modalImprimirPGR">
+    <div class="modal-content" style="width: 500px;">
+        <h3 style="margin-bottom: 10px;"><i class="fa-solid fa-print"></i> Configurar Relatório PGR</h3>
+        <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 15px;">
+            Selecione as avaliações (pesquisas) que farão parte da composição estatística deste PDF:
+        </p>
+        
+        <div id="listaAvaliacoesImprimir" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; border: 1px solid var(--border); padding: 10px; border-radius: 4px; background: #f8fafc;">
+            </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-primary btn-outline" onclick="document.getElementById('modalImprimirPGR').classList.remove('active')">Cancelar</button>
+            <button type="button" class="btn-primary" onclick="executarImpressaoPGR()"><i class="fa-solid fa-file-pdf"></i> Gerar Documento</button>
+        </div>
+    </div>
+    </div>
+
+    
+
+<!-- Modal de Edição de Risco -->
+<div class="modal-overlay" id="modalEditarRisco">
+    <div class="modal-content" style="width: 600px;"> <!-- Deixei mais largo para caber os textos -->
+        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-pencil"></i> Editar Avaliação de Risco e Plano de Ação</h3>
+        <form id="formEditarRisco" onsubmit="salvarEdicaoRisco(event)">
+            <input type="hidden" id="editId">
+            
+            <div class="form-group">
+                <label>Fator de Risco / Perigo (Bloqueado para edição):</label>
+                <!-- READONLY adicionado para bloquear a edição e fundo cinza para indicar o bloqueio -->
+                <input type="text" id="editPerigo" readonly style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed; font-size: 0.85rem;">
+            </div>
+            
+            <div style="display:flex; gap: 10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Probabilidade (P):</label>
+                    <input type="number" id="editProb" min="1" max="5" required>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Severidade (S):</label>
+                    <input type="number" id="editSev" min="1" max="5" required>
+                </div>
+            </div>
+
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+            <h4 style="margin-bottom: 10px; font-size: 0.95rem; color: var(--sidebar-bg);"><i class="fa-solid fa-clipboard-check"></i> Plano de Ação (NR-1)</h4>
+            
+            <div class="form-group">
+                <label>Medida de Prevenção a ser adotada:</label>
+                <input type="text" id="editAcao" required placeholder="Ex: Estabelecer canais anônimos de escuta">
+            </div>
+
+            <div style="display:flex; gap: 10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Setores Envolvidos na Solução:</label>
+                    <input type="text" id="editSetoresEnv" placeholder="Ex: RH, Diretoria e SESMT" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Responsabilidades (O que cada setor fará?):</label>
+                <textarea id="editResp" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit;" placeholder="Ex: RH - Criar o canal; SESMT - Monitorar dados semanais." required></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-primary btn-outline" onclick="fecharModalEdicao()">Cancelar</button>
+                <button type="submit" class="btn-primary"><i class="fa-solid fa-save"></i> Salvar Revisão e Ação</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    <script src="js-cerebro.js"></script>
+    <script src="js-inventario.js"></script>
+    <script src="js-dashboard.js"></script>
+    <script src="js-impressao.js"></script>
+
+
+
+    <!-- Modal de Resultados de Pesquisa (Importado para o Dashboard) -->
+    <div class="modal-overlay" id="modalResultados">
+        <div class="modal-content" style="width: 700px;">
+            <h3><i class="fa-solid fa-chart-pie"></i> Resultados da Pesquisa</h3>
+            <div id="conteudoResultados" style="margin-top: 20px; max-height: 400px; overflow-y: auto;">
+                <!-- Os gráficos de votação vão aparecer aqui -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-primary" onclick="document.getElementById('modalResultados').classList.remove('active')">Fechar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

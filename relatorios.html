@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios AEP | PSI-GRO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper"><i class="fa-solid fa-brain"></i> <span class="logo-text">PSI-GRO</span></div>
+            <button class="toggle-btn" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <ul class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            <a href="inventario.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Inventário de Riscos</span></a>
+            <a href="planos-acao.html" class="nav-item"><i class="fa-solid fa-tasks"></i> <span>Planos de Ação</span></a>
+            <a href="relatorios.html" class="nav-item active"><i class="fa-solid fa-file-pdf"></i> <span>Relatórios AEP</span></a>
+            <a href="configuracoes.html" class="nav-item"><i class="fa-solid fa-cog"></i> <span>Configurações</span></a>
+            <a href="#" class="nav-item" style="margin-top: auto; color: #ef4444;" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Sair do Sistema</span>
+            </a>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h2>Gerenciamento de Relatórios e Avaliações AEP</h2>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="panel">
+                <div class="panel-title">
+                    Histórico de Avaliações
+                    <button class="btn-primary" onclick="iniciarAvaliacao()">
+                        <i class="fa-solid fa-plus"></i> Gerar Novo Relatório
+                    </button>
+                </div>
+                
+                <div class="grid-cards" id="container-avaliacoes"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalQrCode">
+    <div class="modal-content" style="text-align: center; width: 400px;">
+        <h3 style="margin-bottom: 10px;">Link de Avaliação Anônima</h3>
+        <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">
+            Envie este código aos colaboradores. O preenchimento é 100% anônimo.
+        </p>
+        
+        <img id="qrCodeImg" src="" alt="QR Code" style="border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin-bottom: 20px; width: 200px; height: 200px;">
+        
+        <div class="form-group" style="text-align: left;">
+            <label>Link Direto:</label>
+            <input type="text" id="linkAvaliacao" readonly style="background-color: #f8fafc; font-size: 0.8rem;">
+        </div>
+
+        <div class="modal-actions" style="justify-content: center; margin-top: 15px;">
+            <button type="button" class="btn-primary btn-outline" onclick="fecharModalQr()">Fechar</button>
+            <button type="button" class="btn-primary" onclick="copiarLink()">
+                <i class="fa-solid fa-copy"></i> Copiar Link
+            </button>
+        </div>
+    </div>
+    </div>
+    
+
+    <div class="modal-overlay" id="modalResultados">
+    <div class="modal-content" style="width: 700px;">
+        <h3><i class="fa-solid fa-chart-pie"></i> Resultados da Pesquisa</h3>
+        <div id="conteudoResultados" style="margin-top: 20px; max-height: 400px; overflow-y: auto;">
+            </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" onclick="document.getElementById('modalResultados').classList.remove('active')">Fechar</button>
+        </div>
+    </div>
+    </div>
+
+
+<script src="js-cerebro.js"></script>
+    <script src="js-relatorios.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos de Ação | PSI-GRO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper"><i class="fa-solid fa-brain"></i> <span class="logo-text">PSI-GRO</span></div>
+            <button class="toggle-btn" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <ul class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            <a href="inventario.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Inventário de Riscos</span></a>
+            <a href="planos-acao.html" class="nav-item active"><i class="fa-solid fa-tasks"></i> <span>Planos de Ação</span></a>
+            <a href="relatorios.html" class="nav-item"><i class="fa-solid fa-file-pdf"></i> <span>Relatórios AEP</span></a>
+            <a href="configuracoes.html" class="nav-item"><i class="fa-solid fa-cog"></i> <span>Configurações</span></a>
+            <a href="#" class="nav-item" style="margin-top: auto; color: #ef4444;" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Sair do Sistema</span>
+            </a>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar"><h2>Acompanhamento de Medidas de Prevenção</h2></header>
+
+        <div class="dashboard-container">
+            <div class="panel">
+                <div class="panel-title">Cronograma de Ações</div>
+                <table>
+                    <thead>
+            <tr>
+                <th>Setor Raiz</th>
+                <th>Perigo Atrelado</th>
+                <th>Medida de Prevenção</th>
+                <th>Setores Envolvidos</th>
+                <th>Responsabilidades (Implementação)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+                    <tbody id="tb-planos"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+ 
+
+
+
+
+
+    <script src="js-cerebro.js"></script>
+    <script src="js-planos-acao.js"></script>
+</body>
+</html>

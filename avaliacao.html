@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Clima e Condições de Trabalho</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* MANTENHA O MESMO CSS DA SUA AVALIAÇÃO AQUI DENTRO */
+        :root { --bg-color: #f4f6f9; --text-main: #334155; --text-light: #64748b; --white: #ffffff; --border: #e2e8f0; --btn-yellow: #facc15; --btn-yellow-hover: #eab308; --sidebar-bg: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 20px; }
+        .survey-container { background-color: var(--white); width: 100%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; margin-top: 20px; margin-bottom: 40px; }
+        .survey-header { background-color: var(--sidebar-bg); color: var(--white); padding: 25px 20px; text-align: center; }
+        .survey-header i { color: var(--btn-yellow); font-size: 2rem; margin-bottom: 10px; }
+        .survey-body { padding: 30px 20px; }
+        .alert-anonymous { background-color: #dcfce7; color: #166534; padding: 12px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; border: 1px solid #bbf7d0; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.95rem; }
+        select, .radio-group label { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; background-color: #f8fafc; }
+        select:focus { outline: none; border-color: var(--sidebar-bg); }
+        .radio-group { display: flex; flex-direction: column; gap: 8px; }
+        .radio-group label { display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; font-weight: normal; }
+        .radio-group label:hover { background-color: #f1f5f9; }
+        .radio-group input[type="radio"] { transform: scale(1.2); accent-color: var(--sidebar-bg); }
+        .btn-submit { background-color: var(--btn-yellow); color: #453303; border: none; width: 100%; padding: 15px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; margin-top: 10px; }
+        .btn-submit:hover { background-color: var(--btn-yellow-hover); }
+        #success-screen { display: none; text-align: center; padding: 40px 20px; }
+        #success-screen i { font-size: 4rem; color: #16a34a; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="survey-container">
+        <div class="survey-header" id="header-box">
+            <i class="fa-solid fa-brain"></i>
+            <h2>Mapeamento de Condições de Trabalho</h2>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 5px;">Portaria MTE nº 1.419/2024 (NR-1)</p>
+        </div>
+
+        <div class="survey-body" id="form-screen">
+            <div class="alert-anonymous">
+                <i class="fa-solid fa-user-secret" style="font-size: 1.2rem;"></i>
+                <span><strong>Pesquisa 100% Anônima.</strong> Nenhuma informação pessoal será coletada.</span>
+            </div>
+
+            <form id="surveyForm" onsubmit="enviarPesquisa(event)">
+                
+                <div class="form-group">
+                    <label>1. Qual é o seu setor de trabalho atual?</label>
+                    <select id="setor" name="setor" required>
+                        <option value="" disabled selected>Selecione seu setor...</option>
+                        </select>
+                </div>
+
+                <div id="perguntas-dinamicas"></div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar Respostas Anonimamente
+                </button>
+            </form>
+        </div>
+
+        <div id="success-screen">
+            <i class="fa-solid fa-circle-check"></i>
+            <h2 style="margin-bottom: 10px;">Respostas Enviadas!</h2>
+            <p style="color: var(--text-light); font-size: 0.95rem;">Obrigado! Suas respostas ajudarão a melhorar as condições de trabalho.</p>
+        </div>
+    </div>
+
+    
+       
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Carrega Setores
+            const setores = getSetoresConfig();
+            const selectSetor = document.getElementById('setor');
+            setores.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.innerText = s;
+                selectSetor.appendChild(opt);
+            });
+
+            // 2. Carrega Perguntas
+            const perguntas = getPerguntasConfig();
+            const containerPerguntas = document.getElementById('perguntas-dinamicas');
+            
+            // Localize este bloco dentro do DOMContentLoaded da avaliacao.html
+           perguntas.forEach((p, index) => {
+               const numero = index + 2;
+    
+               // CORREÇÃO: Usar opcao.texto em vez de apenas opcao
+               const radiosHtml = p.opcoes.map(opcao => `
+                   <label>
+                       <input type="radio" name="${p.id}" value="${opcao.texto}" required> 
+                       ${opcao.texto}
+                   </label>
+               `).join('');
+
+             containerPerguntas.innerHTML += `
+                   <div class="form-group">
+                <label>${numero}. ${p.texto}</label>
+                <div class="radio-group">${radiosHtml}</div>
+                   </div>
+               `;
+           });
+        });
+
+        function enviarPesquisa(event) {
+            event.preventDefault(); 
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const avaliacaoId = urlParams.get('id');
+
+            if (!avaliacaoId) return alert("Erro: O link desta pesquisa é inválido ou está quebrado.");
+
+            // Coleta os dados dinâmicos do formulário usando FormData
+            const formElement = document.getElementById('surveyForm');
+            const formData = new FormData(formElement);
+            
+            let respostasDinamicas = {};
+            let setorEscolhido = "";
+
+            for (let [name, value] of formData.entries()) {
+                if (name === 'setor') {
+                    setorEscolhido = value;
+                } else {
+                    respostasDinamicas[name] = value;
+                }
+            }
+
+            const novaResposta = {
+                id: Date.now(),
+                avaliacaoId: avaliacaoId,
+                dataHora: new Date().toLocaleString('pt-BR'),
+                setor: setorEscolhido,
+                respostas: respostasDinamicas
+            };
+
+            let bancoRespostas = getRespostas();
+            bancoRespostas.push(novaResposta);
+            salvarRespostas(bancoRespostas);
+            
+            document.getElementById('form-screen').style.display = 'none';
+            document.getElementById('header-box').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+    </script>
+
+
+<script src="js-cerebro.js"></script>
+</body>
+</html>

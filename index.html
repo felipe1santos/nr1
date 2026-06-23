@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSI-GRO | Sistema de Adequação NR-1 e COPSOQ</title>
+    <!-- Fonte Inter para visual mais profissional -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <!-- Meta Pixel Code -->
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+
+/* Inicializa o Pixel Antigo */
+fbq('init', '1786134392797022'); 
+/* Inicializa o Pixel Novo */
+fbq('init', '1253726709725307'); 
+
+/* Dispara o PageView para ambos */
+fbq('track', 'PageView');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1786134392797022&ev=PageView&noscript=1" />
+  <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1253726709725307&ev=PageView&noscript=1" />
+</noscript>
+<!-- End Meta Pixel Code -->
+
+
+
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18077128206"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18077128206');
+</script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #fbc02d; /* Amarelo do sistema */
+            --primary-hover: #f9a825;
+            --sidebar-bg: #1e293b; /* Azul escuro do painel */
+            --bg-light: #f8fafc; 
+            --text-main: #334155;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --alert-red: #ef4444; 
+            
+            /* Cores da Matriz */
+            --risk-low: #86efac;
+            --risk-mod: #fde047;
+            --risk-high: #fdba74;
+            --risk-crit: #fca5a5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+
+        /* NAVEGAÇÃO */
+        header { background-color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--sidebar-bg); display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary); }
+        .header-buttons { display: flex; gap: 15px; align-items: center; }
+        
+        .btn { background-color: var(--primary); color: #453303; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+        .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--sidebar-bg); }
+        .btn-outline:hover { background-color: var(--primary); color: #453303; }
+
+        /* HERO */
+        .hero { text-align: center; padding: 80px 5% 60px; background-color: var(--white); position: relative; }
+        .hero h1 { font-size: 3.2rem; max-width: 900px; margin: 0 auto 20px; color: var(--sidebar-bg); line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+        .hero p { font-size: 1.2rem; color: var(--text-light); max-width: 700px; margin: 0 auto 30px; }
+
+        /* HERO NOTIFICATIONS (CASCATA) */
+        .hero-notifications { position: absolute; left: 200px; top: 35%; display: flex; flex-direction: column; gap: 15px; z-index: 5; pointer-events: none; }
+        .hero-notification-card { background: var(--white); border-radius: 0 8px 8px 0; padding: 14px 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 0.95rem; color: var(--sidebar-bg); border-left: 5px solid var(--primary); transform: translateX(-150%); animation: slideIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-notification-card i { font-size: 1.3rem; color: var(--primary); }
+        
+        .hero-notification-card:nth-child(1) { animation-delay: 0.3s; }
+        .hero-notification-card:nth-child(2) { animation-delay: 0.6s; }
+        .hero-notification-card:nth-child(3) { animation-delay: 0.9s; }
+        .hero-notification-card:nth-child(4) { animation-delay: 1.2s; }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* MOCKUP CONTAINER (HERO) */
+        .hero-mockup-container { position: relative; max-width: 950px; margin: 40px auto 0; padding-bottom: 20px; }
+        
+        /* MOCKUP MONITOR */
+        .monitor-mockup { width: 100%; max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+        .monitor-frame { background: #1e293b; padding: 15px 15px 25px; border-radius: 12px 12px 0 0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); border: 2px solid #334155; border-bottom: none; }
+        .monitor-screen { background: #fff; width: 100%; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; position: relative; }
+        .monitor-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+        .monitor-logo { width: 100%; height: 25px; background: #1e293b; text-align: center; color: #64748b; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; letter-spacing: 2px; }
+        .monitor-stand { width: 60px; height: 50px; margin: 0 auto; background: linear-gradient(to right, #94a3b8, #cbd5e1, #94a3b8); border-left: 2px solid #64748b; border-right: 2px solid #64748b; }
+        .monitor-base { width: 220px; height: 12px; margin: 0 auto; background: linear-gradient(to right, #94a3b8, #e2e8f0, #94a3b8); border-radius: 6px 6px 0 0; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+
+        /* MOCKUP CELULAR GENÉRICO */
+        .phone-mockup { width: 280px; height: 560px; background: #111; border-radius: 35px; padding: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; border: 4px solid #cbd5e1; }
+        .phone-screen { background: var(--bg-light); width: 100%; height: 100%; border-radius: 25px; overflow: hidden; position: relative; }
+        .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 20px; background: #111; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; z-index: 10; }
+        .app-header { background: var(--sidebar-bg); color: white; padding: 30px 15px 15px; text-align: center; font-size: 0.9rem; font-weight: 600; }
+        .app-body { padding: 15px; }
+        .app-question { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; color: var(--sidebar-bg); }
+        .app-radio { background: white; padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.8rem; display: flex; gap: 8px; align-items: center; color: var(--text-main); }
+        .app-btn { background: var(--primary); width: 100%; padding: 12px; text-align: center; border-radius: 6px; font-weight: 600; font-size: 0.85rem; margin-top: 15px; color: #453303; }
+
+        /* CELULAR POSICIONADO NO HERO (Ajustado mais para a direita) */
+        .phone-hero-position { position: absolute; bottom: -20px; right: -50px; z-index: 2; transform: scale(0.85); transform-origin: bottom right; box-shadow: -15px 25px 50px rgba(0,0,0,0.4); border-color: #94a3b8; }
+
+        /* BOTÃO PRINCIPAL HERO */
+        .hero-btn-container { position: relative; z-index: 10; margin-top: 50px; }
+
+        /* COMO O SISTEMA TRATA OS DADOS */
+        .features-grid-section { padding: 80px 5%; background-color: var(--white); text-align: center; border-top: 1px solid var(--border); }
+        .features-grid-section h2 { font-size: 2.5rem; color: var(--sidebar-bg); margin-bottom: 50px; font-weight: 700; letter-spacing: -0.02em; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.2; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .feature-box { background: var(--bg-light); border: 1px solid var(--border); border-radius: 16px; padding: 40px 30px; text-align: left; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-box:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+        .feature-icon-wrapper { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 25px; }
+        
+        .icon-yellow { background-color: #fef3c7; color: #d97706; }
+        .icon-blue { background-color: #e0e7ff; color: #4f46e5; }
+        .icon-green { background-color: #dcfce7; color: #16a34a; }
+        .icon-red { background-color: #fee2e2; color: #dc2626; }
+        .icon-purple { background-color: #f3e8ff; color: #9333ea; }
+        .icon-yellow-light { background-color: #fef9c3; color: #ca8a04; }
+
+        .feature-box h3 { font-size: 1.2rem; color: var(--sidebar-bg); margin-bottom: 15px; font-weight: 600; }
+        .feature-box p { font-size: 0.95rem; color: var(--text-light); line-height: 1.6; }
+
+        /* DASHBOARD PREVIEW */
+        .dashboard-preview { padding: 40px 5%; max-width: 1300px; margin: -20px auto 40px; }
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .dash-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; }
+        .dash-title { font-size: 0.95rem; font-weight: 600; color: var(--sidebar-bg); margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dash-desc { font-size: 0.85rem; color: var(--text-light); text-align: center; margin-top: 20px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 15px; width: 100%; }
+        
+        /* MATRIZ CSS */
+        .matriz-risco { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 35px); gap: 2px; width: 100%; margin: 0 auto; }
+        .matriz-celula { display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: rgba(0,0,0,0.6); border-radius: 2px; }
+        .bg-verde { background-color: var(--risk-low); }
+        .bg-amarelo { background-color: var(--risk-mod); }
+        .bg-laranja { background-color: var(--risk-high); }
+        .bg-vermelho { background-color: var(--risk-crit); }
+
+        /* AUTOMAÇÃO SST */
+        .sst-section { padding: 80px 5%; background-color: var(--bg-light); border-top: 1px solid var(--border); }
+        .sst-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .sst-text h2 { font-size: 2.2rem; color: var(--sidebar-bg); margin-bottom: 20px; font-weight: 700; letter-spacing: -0.02em; }
+        .sst-text p { font-size: 1.1rem; margin-bottom: 20px; color: var(--text-light); }
+        .feature-list { list-style: none; margin-top: 30px; }
+        .feature-list li { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .feature-list i { font-size: 1.5rem; color: var(--primary); margin-top: 3px; }
+        .feature-list h4 { font-size: 1.1rem; color: var(--sidebar-bg); font-weight: 600; }
+        .feature-list p { font-size: 0.95rem; margin-top: 5px; }
+
+        /* GRUPOS DE RISCO COPSOQ */
+        .risk-groups-section { padding: 80px 5%; background-color: var(--white); }
+        .risk-groups-title { text-align: center; font-size: 2.2rem; color: var(--sidebar-bg); margin-bottom: 15px; font-weight: 700; }
+        .copsoq-subtitle { text-align: center; font-size: 1.4rem; color: #1e293b; font-weight: 600; margin-bottom: 15px; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .copsoq-desc { text-align: center; font-size: 1.05rem; color: var(--text-light); max-width: 850px; margin: 0 auto 50px; line-height: 1.6; }
+        
+        .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; max-width: 1300px; margin: 0 auto; }
+        .risk-card { background: var(--bg-light); border: 1px solid var(--border); border-radius: 12px; padding: 30px 20px; text-align: center; transition: 0.3s; }
+        .risk-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
+        .risk-icon { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+        .risk-card h4 { font-size: 1.1rem; color: var(--sidebar-bg); margin-bottom: 20px; height: 45px; display: flex; align-items: center; justify-content: center; line-height: 1.2; font-weight: 600; }
+        .risk-card ul { list-style: none; text-align: left; padding: 0; }
+        .risk-card li { font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px; padding-left: 20px; position: relative; line-height: 1.4; }
+        .risk-card li::before { content: "•"; color: var(--primary); position: absolute; left: 0; font-size: 1.2rem; line-height: 1; top: -2px; }
+
+        /* PREVIEW DO RELATÓRIO PGR + ESOCIAL FLUTUANTE */
+        .report-preview-section { padding: 80px 5% 120px; background-color: var(--bg-light); text-align: center; border-top: 1px solid var(--border); overflow: hidden; }
+        .report-wrapper { position: relative; max-width: 1000px; margin: 40px auto 0; display: flex; justify-content: center; }
+        .report-mockup-container { width: 100%; background: white; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid var(--border); overflow: hidden; position: relative; z-index: 1; }
+        
+        /* Widget eSocial SST */
+        .esocial-floating-widget { position: absolute; right: -90px; top: -50px; width: 340px; z-index: 10; display: flex; flex-direction: column; align-items: flex-end; animation: float 6s ease-in-out infinite; }
+        .esocial-floating-widget img { max-width: 150px; margin-bottom: 15px; margin-right: 15px; drop-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .esocial-floating-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-left: 5px solid #16a34a; text-align: left; border: 1px solid var(--border); }
+        .esocial-floating-card h4 { font-size: 1.05rem; color: var(--sidebar-bg); margin-bottom: 10px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .esocial-floating-card p { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; margin-bottom: 0; }
+        .esocial-floating-card .alert { background: #fef2f2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 0.75rem; margin-top: 12px; font-weight: 600; border: 1px solid #fecaca; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* PREÇO */
+        .pricing-section { padding: 80px 5%; background-color: var(--sidebar-bg); text-align: center; color: white; }
+        .price-card { background: white; color: var(--text-main); max-width: 400px; margin: 40px auto 0; padding: 40px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
+        .price-value { font-size: 3.5rem; font-weight: 700; color: var(--sidebar-bg); margin: 15px 0; letter-spacing: -1px; }
+        .price-value span { font-size: 1.5rem; vertical-align: super; font-weight: 500; }
+        .price-features { list-style: none; margin: 25px 0; text-align: left; }
+        .price-features li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; display: flex; gap: 10px; }
+        .price-features i { color: #16a34a; }
+
+        /* FAQ */
+        .faq-section { padding: 80px 5%; max-width: 900px; margin: 0 auto; background: var(--bg-light); }
+        .faq-item { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; padding: 20px; }
+        .faq-question { font-weight: 600; font-size: 1.1rem; color: var(--sidebar-bg); margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+        .faq-answer { color: var(--text-light); font-size: 0.95rem; margin-left: 28px; }
+
+        /* FOOTER & WHATSAPP */
+        footer { background: var(--white); padding: 40px 5%; text-align: center; border-top: 1px solid var(--border); }
+        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1000; text-decoration: none; }
+        .whatsapp-float:hover { transform: scale(1.1); background-color: #1ebe57; }
+
+        @media (max-width: 1200px) {
+            .esocial-floating-widget { position: relative; right: 0; top: 0; align-items: center; margin-bottom: 30px; animation: none; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; }
+            .report-wrapper { flex-direction: column; }
+            .hero-notifications { display: none; } /* Oculta na versão mobile/tablet para não poluir a tela */
+        }
+
+        @media (max-width: 900px) {
+            .dash-grid, .sst-container { grid-template-columns: 1fr; text-align: center; }
+            .hero h1 { font-size: 2.2rem; }
+            .feature-list li { text-align: left; }
+            .phone-hero-position { right: 50%; transform: scale(0.7) translateX(50%); bottom: -40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO -->
+    <header>
+    <div class="logo"><i class="fa-solid fa-brain"></i> PSI-GRO</div>
+    <div class="header-buttons">
+        <a href="https://nr1sistema.com.br/" class="btn btn-outline"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar</a>
+        
+        <a href="#preco" class="btn">Garantir Acesso</a>
+    </div>
+</header>
+
+    <!-- HERO SECTION (COM MOCKUPS, BOTÃO E CASCATA) -->
+    <section class="hero">
+        
+        <!-- Notificações em Cascata (Visível em Desktop) -->
+        <div class="hero-notifications">
+            <div class="hero-notification-card">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard Visual
+            </div>
+            <div class="hero-notification-card">
+                <i class="fa-solid fa-calculator"></i> Cálculo Automático
+            </div>
+            <div class="hero-notification-card">
+                <i class="fa-solid fa-list-check"></i> Plano de Ação 5W2H
+            </div>
+            <div class="hero-notification-card">
+                <i class="fa-solid fa-file-contract"></i> Inventário de Risco
+            </div>
+        </div>
+
+        <h1>Evite multas da NR-1 com um plano de ação que funciona de verdade.</h1>
+        <p>A ferramenta que transforma a percepção dos trabalhadores em dados concretos. Avaliação COPSOQ, Inventário de Riscos e Plano de Ação gerados com agilidade e precisão.</p>
+
+        <!-- Conjunto de Mockups (Monitor + Celular Deslocado) -->
+        <div class="hero-mockup-container">
+            
+            <!-- Monitor -->
+            <div class="monitor-mockup">
+                <div class="monitor-frame">
+                    <div class="monitor-screen">
+                        <img src="dashboard.webp" alt="Painel de Controle PSI-GRO">
+                    </div>
+                </div>
+                <div class="monitor-logo"><i class="fa-solid fa-power-off"></i></div>
+                <div class="monitor-stand"></div>
+                <div class="monitor-base"></div>
+            </div>
+
+            <!-- Celular Sobreposto (Mais para a direita) -->
+            <div class="phone-mockup phone-hero-position">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <div class="app-header">
+                        <i class="fa-solid fa-brain" style="color:var(--primary); font-size: 1.5rem; margin-bottom:5px; display:block;"></i>
+                        Pesquisa de Condições
+                    </div>
+                    <div class="app-body">
+                        <div style="background: #dcfce7; color: #166534; padding: 8px; border-radius: 4px; font-size: 0.7rem; margin-bottom: 15px; border: 1px solid #bbf7d0;">
+                            <i class="fa-solid fa-user-secret"></i> Pesquisa 100% Anônima
+                        </div>
+                        
+                        <div class="app-question">1. O volume de trabalho é compatível com seu tempo?</div>
+                        
+                        <div class="app-radio"><input type="radio" name="hq1"> Sempre</div>
+                        <div class="app-radio"><input type="radio" name="hq1" checked> Às vezes</div>
+                        <div class="app-radio"><input type="radio" name="hq1"> Raramente</div>
+                        <div class="app-radio"><input type="radio" name="hq1"> Nunca</div>
+
+                        <div class="app-btn">Próxima Pergunta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Principal Movido para Baixo dos Mockups -->
+        <div class="hero-btn-container">
+            <a href="#preco" class="btn" style="font-size: 1.15rem; padding: 18px 40px; box-shadow: 0 10px 20px rgba(251, 192, 45, 0.3);"> Quero adequar minha empresa à nova NR-1</a>
+        </div>
+    </section>
+
+    <!-- COMO O SISTEMA TRATA OS DADOS -->
+    <section class="features-grid-section">
+        <h2>Como o PSI-GRO estrutura e trata os dados da sua empresa</h2>
+        
+        <div class="features-grid">
+            
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-yellow">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3>Levantamento dos riscos</h3>
+                <p>Nossa plataforma realiza a aplicação do protocolo COPSOQ de forma totalmente digital. O sistema coleta os dados de maneira estruturada, adaptando-se perfeitamente à escala e à rotina operacional da sua organização.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-blue">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+                <h3>Análise Estruturada</h3>
+                <p>O algoritmo processa as respostas anônimas cruzando dados de severidade e probabilidade. Ele quantifica as percepções subjetivas, transformando o sentimento dos colaboradores em métricas exatas para a sua matriz de risco.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-green">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </div>
+                <h3>Mapa de calor</h3>
+                <p>Tenha uma visão panorâmica e clara dos riscos departamentalizados na plataforma. O sistema compila os dados e gera gráficos comparativos entre os setores, indicando exatamente onde a intervenção deve ser priorizada.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-red">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>Plano de ação sob medida</h3>
+                <p>O sistema gera propostas de intervenção estruturadas (formato 5W2H) baseadas nos dados coletados. Um direcionamento focado em resolver a raiz dos problemas identificados no mapeamento organizacional.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-purple">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <h3>Gestão Contínua</h3>
+                <p>Vá além do diagnóstico pontual. A plataforma permite o acompanhamento contínuo da evolução dos indicadores de saúde mental e o monitoramento da eficácia das ações implementadas ao longo do tempo.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-yellow-light">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h3>Evidências e conformidade</h3>
+                <p>O sistema compila todo o tratamento de dados e gera a documentação completa do PGR em PDF. Relatórios técnicos padronizados, resguardando a sua empresa e prontos para apresentação imediata em auditorias do MTE.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- GRÁFICOS (DASHBOARD PREVIEW) -->
+    <section class="dashboard-preview">
+        <div class="dash-grid">
+            
+            <!-- Matriz de Risco -->
+            <div class="dash-card">
+                <h3 class="dash-title" style="color: var(--text-light);">A Matriz de Risco (NR-1)</h3>
+                
+                <div style="width: 100%; text-align: left; font-size: 0.85rem; margin-bottom: 5px; color: var(--sidebar-bg);">Severidade ➔</div>
+                
+                <div class="matriz-risco">
+                    <div class="matriz-celula bg-amarelo"></div> <div class="matriz-celula bg-laranja"></div> <div class="matriz-celula bg-laranja"></div> <div class="matriz-celula bg-vermelho"></div> <div class="matriz-celula bg-vermelho">O</div>
+                    <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-amarelo"></div> <div class="matriz-celula bg-laranja">O</div> <div class="matriz-celula bg-vermelho"></div> <div class="matriz-celula bg-vermelho"></div>
+                    <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-amarelo"></div> <div class="matriz-celula bg-laranja"></div> <div class="matriz-celula bg-vermelho"></div>
+                    <div class="matriz-celula bg-verde">O</div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-amarelo"></div> <div class="matriz-celula bg-laranja"></div>
+                    <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-verde"></div> <div class="matriz-celula bg-amarelo"></div>
+                </div>
+                
+                <div style="width: 100%; text-align: center; font-size: 0.85rem; margin-top: 10px; margin-bottom: auto; color: var(--sidebar-bg);">Probabilidade ➔</div>
+                
+                <div class="dash-desc">
+                    A Matriz de Risco Automatizada cruza os dados de <strong>Severidade</strong> (consequências) e <strong>Probabilidade</strong> (frequência) das respostas coletadas. O sistema calcula automaticamente o score final, classificando cada risco psicossocial de Baixo a Crítico, eliminando o viés humano na avaliação.
+                </div>
+            </div>
+
+            <!-- Gráfico Radar -->
+            <div class="dash-card">
+                <div class="dash-title" style="border-bottom: none; color: var(--text-light);">Riscos por Setor (Carga Bruta)</div>
+                <div style="width: 100%; height: 250px; position: relative; margin-top: auto; margin-bottom: auto;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="dash-desc">
+                    Visualize a distribuição da carga de risco total por setor. O gráfico de teia permite identificar rapidamente qual departamento ou unidade de negócio apresenta as maiores pontuações agregadas e exige atenção prioritária.
+                </div>
+            </div>
+
+            <!-- Evolução -->
+            <div class="dash-card">
+                <div class="dash-title" style="border-bottom: none; color: var(--text-light);">Evolução de Riscos Críticos</div>
+                <div style="width: 100%; height: 250px; position: relative; margin-top: auto; margin-bottom: auto;">
+                    <canvas id="lineChart"></canvas>
+                </div>
+                <div class="dash-desc">
+                    Acompanhe a eficiência das suas medidas de controle ao longo do tempo. Este indicador histórico mostra a tendência de aumento ou redução de riscos críticos após a implementação e execução dos planos de ação (5W2H).
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- AUTOMAÇÃO E MOCKUP DA COLETA -->
+    <section class="sst-section" id="sst">
+        <div class="sst-container">
+            <div class="sst-text">
+                <h2>O fim do trabalho manual no PGR.</h2>
+                <p>O PSI-GRO foi desenhado para facilitar a vida do Profissional de SST e do RH. Esqueça planilhas complexas. O nosso motor cruza as respostas dos trabalhadores e constrói o seu documento base automaticamente.</p>
+                
+                <ul class="feature-list">
+                    <li>
+                        <i class="fa-solid fa-qrcode"></i>
+                        <div>
+                            <h4>1. Coleta 100% Digital e Anônima</h4>
+                            <p>Gere um QR Code ou Link. Os funcionários respondem ao questionário COPSOQ pelo celular em 3 minutos, garantindo sigilo total.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-microchip"></i>
+                        <div>
+                            <h4>2. Inventário de Risco Automático</h4>
+                            <p>O sistema processa as respostas e popula o Inventário (GRO) indicando Perigo, Fator, Lesões e Nível de Risco pela Matriz 5x5.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <div>
+                            <h4>3. Plano de Ação e Relatório (NR-1)</h4>
+                            <p>Gere o PDF do PGR estruturado em segundos, incluindo cronogramas preventivos (5W2H) focados nos setores críticos.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Mockup Celular da Coleta -->
+            <div>
+                <div class="phone-mockup" style="margin: 0 auto;">
+                    <div class="phone-screen">
+                        <div class="phone-notch"></div>
+                        <div class="app-header">
+                            <i class="fa-solid fa-brain" style="color:var(--primary); font-size: 1.5rem; margin-bottom:5px; display:block;"></i>
+                            Pesquisa de Condições
+                        </div>
+                        <div class="app-body">
+                            <div style="background: #dcfce7; color: #166534; padding: 8px; border-radius: 4px; font-size: 0.7rem; margin-bottom: 15px; border: 1px solid #bbf7d0;">
+                                <i class="fa-solid fa-user-secret"></i> Pesquisa 100% Anônima
+                            </div>
+                            
+                            <div class="app-question">1. O volume de trabalho é compatível com seu tempo?</div>
+                            
+                            <div class="app-radio"><input type="radio" name="q1"> Sempre</div>
+                            <div class="app-radio"><input type="radio" name="q1" checked> Às vezes</div>
+                            <div class="app-radio"><input type="radio" name="q1"> Raramente</div>
+                            <div class="app-radio"><input type="radio" name="q1"> Nunca</div>
+
+                            <div class="app-btn">Próxima Pergunta</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-light); font-size: 0.85rem; margin-top: 15px;">Interface real de coleta vista pelo colaborador.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- GRUPOS COPSOQ -->
+    <section class="risk-groups-section">
+        <h2 class="risk-groups-title">Os 5 Grandes Grupos de Risco Ocupacional</h2>
+        
+        <!-- H2 EXPLICATIVO COPSOQ -->
+        <h3 class="copsoq-subtitle">Nós utilizamos a metodologia científica do COPSOQ II-Br</h3>
+        <p class="copsoq-desc">
+            O Copenhagen Psychosocial Questionnaire (COPSOQ) é um protocolo internacionalmente validado e recomendado para o mapeamento rigoroso de riscos psicossociais no ambiente de trabalho. A nossa plataforma traduz essas avaliações complexas em dados quantitativos precisos, garantindo segurança jurídica e eficácia real no direcionamento das suas intervenções organizacionais.
+        </p>
+
+        <div class="risk-grid">
+            
+            <div class="risk-card">
+                <i class="fa-solid fa-stopwatch risk-icon"></i>
+                <h4>Ritmo e Carga de Trabalho</h4>
+                <ul>
+                    <li>O seu volume de trabalho é excessivo para o tempo disponível?</li>
+                    <li>Você precisa trabalhar em um ritmo muito acelerado?</li>
+                    <li>É comum não conseguir terminar suas tarefas no horário?</li>
+                </ul>
+            </div>
+
+            <div class="risk-card">
+                <i class="fa-solid fa-face-frown risk-icon"></i>
+                <h4>Exigências Emocionais</h4>
+                <ul>
+                    <li>O seu trabalho exige lidar com situações difíceis ou conflitantes?</li>
+                    <li>Você se sente esgotado emocionalmente ao final do expediente?</li>
+                    <li>Precisa esconder suas verdadeiras emoções ao lidar com clientes ou colegas?</li>
+                </ul>
+            </div>
+
+            <div class="risk-card">
+                <i class="fa-solid fa-puzzle-piece risk-icon"></i>
+                <h4>Autonomia e Desenvolvimento</h4>
+                <ul>
+                    <li>Você tem influência sobre como e quando realizar suas tarefas?</li>
+                    <li>Seu trabalho exige iniciativa e permite desenvolver novas habilidades?</li>
+                    <li>A empresa oferece oportunidades de crescimento profissional?</li>
+                </ul>
+            </div>
+
+            <div class="risk-card">
+                <i class="fa-solid fa-users risk-icon"></i>
+                <h4>Liderança e Apoio Social</h4>
+                <ul>
+                    <li>Você recebe apoio e feedback construtivo da sua chefia imediata?</li>
+                    <li>Pode contar com a ajuda e colaboração dos seus colegas de trabalho?</li>
+                    <li>As informações sobre mudanças são repassadas com clareza?</li>
+                </ul>
+            </div>
+
+            <div class="risk-card">
+                <i class="fa-solid fa-hand-holding-dollar risk-icon"></i>
+                <h4>Recompensas e Segurança</h4>
+                <ul>
+                    <li>Você sente que seu esforço no trabalho é devidamente reconhecido?</li>
+                    <li>O seu salário é justo em relação às suas responsabilidades?</li>
+                    <li>Você tem preocupações constantes em perder o seu emprego?</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PREVIEW DO RELATÓRIO PGR + INTEGRAÇÃO ESOCIAL SST -->
+    <section class="report-preview-section">
+        <h2 style="font-size: 2.5rem; color: var(--sidebar-bg); margin-bottom: 15px; font-weight: 700;">Veja o Relatório Gerado na Prática</h2>
+        <p style="font-size: 1.1rem; color: var(--text-light); max-width: 800px; margin: 0 auto;">Este é o modelo exato do documento PGR que o sistema emite. Formatado, com gráficos reais da matriz de risco e pronto para impressão ou PDF.</p>
+        
+        <div class="report-wrapper">
+            
+            <!-- Widget Flutuante eSocial Integrado -->
+            <div class="esocial-floating-widget">
+                <img src="esocial.webp" alt="Logo eSocial SST">
+                <div class="esocial-floating-card">
+                    <h4><i class="fa-solid fa-cloud-arrow-up" style="color:#16a34a"></i> Facilidade eSocial SST</h4>
+                    <p>O módulo de Saúde e Segurança (SST) é obrigatório. O nosso relatório já compila as métricas do Inventário de Riscos no layout exato exigido pelo Governo, simplificando o envio de CATs e ASOs.</p>
+                    <div class="alert"><i class="fa-solid fa-triangle-exclamation"></i> Evite multas mantendo o eSocial em dia!</div>
+                </div>
+            </div>
+
+            <!-- Iframe Mockup -->
+            <div class="report-mockup-container">
+                <div style="background: #e2e8f0; padding: 12px 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #cbd5e1;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                    <div style="margin-left: 15px; font-size: 0.8rem; color: #64748b; font-family: monospace; background: white; padding: 4px 15px; border-radius: 20px; display: flex; align-items: center; gap: 5px;">
+                        <i class="fa-solid fa-lock" style="font-size: 0.7rem;"></i> app.psigro.com.br/relatorios/pgr-gerado
+                    </div>
+                </div>
+                <iframe src="pgr.html" style="width: 100%; height: 750px; border: none; display: block;" title="Preview do Relatório PGR"></iframe>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- PREÇO -->
+    <section class="pricing-section" id="preco">
+        <h2>Tecnologia de Ponta, Preço Acessível.</h2>
+        <p style="color: #cbd5e1; max-width: 600px; margin: 10px auto 0;">Adquira a licença completa do sistema sem mensalidades abusivas.</p>
+        
+        <div class="price-card">
+            <h3 style="color: var(--text-light); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px;">Acesso Completo</h3>
+            <div class="price-value"><span>R$</span> 197,00</div>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Pagamento Único. Sem Mensalidades.</p>
+            
+            <ul class="price-features">
+                <li><i class="fa-solid fa-check-circle"></i> Pesquisas e Setores Ilimitados</li>
+                <li><i class="fa-solid fa-check-circle"></i> Matriz de Risco 5x5 Automática</li>
+                <li><i class="fa-solid fa-check-circle"></i> Dashboard de Indicadores em Tempo Real</li>
+                <li><i class="fa-solid fa-check-circle"></i> Geração de Relatórios PGR em PDF</li>
+                <li><i class="fa-solid fa-check-circle"></i> Banco de Perguntas COPSOQ Incluso</li>
+            </ul>
+            
+            <a href="https://pay.kiwify.com.br/g4a4K2T" class="btn" style="width: 100%; display: flex; justify-content: center; font-size: 1.1rem; padding: 15px; text-decoration: none;"> 
+    Quero adequar minha empresa à nova NR-1
+</a>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section" id="faq">
+        <h2 style="text-align: center; font-size: 2.2rem; color: var(--sidebar-bg); margin-bottom: 40px; font-weight: 700;">Perguntas Frequentes</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question"><i class="fa-solid fa-circle-question" style="color: var(--primary);"></i> O sistema atende à NR-1?</div>
+            <div class="faq-answer">Sim. O sistema foi desenvolvido especificamente para atender à exigência do Gerenciamento de Riscos Ocupacionais (GRO) da nova NR-1, focando no mapeamento de fatores psicossociais e ergonômicos (NR-17).</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question"><i class="fa-solid fa-circle-question" style="color: var(--primary);"></i> A pesquisa é realmente anônima?</div>
+            <div class="faq-answer">Absolutamente. O formulário de coleta (via link ou QR Code) não pede nome, matrícula ou e-mail. Ele apenas solicita o setor de trabalho para agrupar estatisticamente os dados no inventário.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question"><i class="fa-solid fa-circle-question" style="color: var(--primary);"></i> O que é o COPSOQ?</div>
+            <div class="faq-answer">O Copenhagen Psychosocial Questionnaire (COPSOQ) é um protocolo científico internacionalmente validado para avaliar riscos organizacionais. Utilizá-lo garante segurança jurídica para a sua empresa em caso de auditorias do Ministério do Trabalho.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question"><i class="fa-solid fa-circle-question" style="color: var(--primary);"></i> Preciso pagar mensalidade?</div>
+            <div class="faq-answer">Não. O valor de R$ 197,00 é um pagamento único que lhe dá acesso ao código do sistema para uso vitalício.</div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 10px;"><i class="fa-solid fa-brain"></i> PSI-GRO</div>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px;">Simplificando a Gestão de Saúde e Segurança do Trabalho.</p>
+        <p style="font-size: 0.8rem; color: #94a3b8;">© 2024 PSI-GRO Systems. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- BOTÃO WHATSAPP FLUTUANTE -->
+    
+
+    <!-- SCRIPTS DOS GRÁFICOS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuração global da fonte do Chart.js
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            
+            // GRÁFICO 1: Radar (Carga por Setor)
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Produção', 'Vendas', 'Administrativo', 'Atendimento'],
+                    datasets: [{
+                        label: 'Carga de Risco',
+                        data: [85, 45, 20, 95],
+                        backgroundColor: 'rgba(250, 204, 21, 0.4)',
+                        borderColor: '#eab308',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { beginAtZero: true, max: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // GRÁFICO 2: Linha (Evolução)
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan/24', 'Fev/24', 'Mar/24', 'Abr/24'],
+                    datasets: [
+                        {
+                            label: 'Atendimento',
+                            data: [4, 3, 2, 0],
+                            borderColor: '#ef4444',
+                            tension: 0.3,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Produção',
+                            data: [2, 2, 1, 0],
+                            borderColor: '#3b82f6',
+                            tension: 0.3,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

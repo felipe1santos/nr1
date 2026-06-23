@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário | PSI-GRO</title>
+    
+    <!-- Ícones e Fonte -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSS Global (Menu lateral, topo, cores padrão, botões principais) -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- CSS Específico desta página -->
+    <link rel="stylesheet" href="style-inventario.css">
+    
+    <!-- Gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper"><i class="fa-solid fa-brain"></i> <span class="logo-text">PSI-GRO</span></div>
+            <button class="toggle-btn" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <ul class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            <a href="inventario.html" class="nav-item active"><i class="fa-solid fa-clipboard-list"></i> <span>Inventário de Riscos</span></a>
+            <a href="planos-acao.html" class="nav-item"><i class="fa-solid fa-tasks"></i> <span>Planos de Ação</span></a>
+            <a href="relatorios.html" class="nav-item"><i class="fa-solid fa-file-pdf"></i> <span>Relatórios AEP</span></a>
+            <a href="configuracoes.html" class="nav-item"><i class="fa-solid fa-cog"></i> <span>Configurações</span></a>
+            <a href="#" class="nav-item" style="margin-top: auto; color: #ef4444;" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Sair do Sistema</span>
+            </a>
+        </ul>
+    </aside>
+
+    <!-- SEU MENU LATERAL (ASIDE) CONTINUA AQUI EM CIMA INTACTO -->
+
+    <main class="main-content">
+        <!-- BARRA SUPERIOR CORRIGIDA -->
+        <header class="topbar">
+            <div class="header-left">
+                <h2>Inventário de Riscos</h2>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary btn-outline" style="color: black; border-color: #cbd5e1;">
+                    <i class="fa-solid fa-plus-circle"></i> Novo Inventário
+                </button>
+                <button class="btn-primary btn-outline" style="color: black; border-color: #cbd5e1;">
+                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTAINER QUE DÁ O ESPAÇAMENTO (MARGENS) -->
+        <div class="dashboard-container">
+            
+            <!-- AQUI O JS VAI INJETAR AS TABELAS -->
+            <div class="area-inventario" id="id-area-inventario"></div>
+
+            
+
+        </div>
+    </main>
+
+    <!-- SEUS MODAIS CONTINUAM AQUI EMBAIXO INTACTOS -->
+
+    <div class="modal-overlay" id="modalNovoRisco">
+        <div class="modal-content">
+            <h3>Adicionar Fator de Risco Psicossocial</h3>
+            
+            <form onsubmit="salvarNovoRisco(event)" style="margin-top: 20px;">
+                
+                
+                
+                
+                
+                
+               <div class="form-group">
+                    <label>Setor Avaliado:</label>
+                    <!-- Agora o JS vai injetar os setores aqui dentro -->
+                    <select id="setor" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fator de Risco / Categoria (NR-1):</label>
+                    <!-- Agora o JS vai injetar os fatores e os ícones juntos aqui -->
+                    <select id="perigoSelect" required></select>
+                </div>
+
+
+
+
+
+
+
+                
+
+                <div style="display:flex; gap: 10px;">
+                    <div class="form-group" style="flex:1;"><label>Probabilidade (1 a 5):</label><input type="number" id="prob" min="1" max="5" required></div>
+                    <div class="form-group" style="flex:1;"><label>Severidade (1 a 5):</label><input type="number" id="sev" min="1" max="5" required></div>
+                </div>
+                <div class="form-group"><label>Medida de Prevenção (Plano de Ação):</label><input type="text" id="acao" required></div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary btn-outline" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar no Inventário</button>
+                </div>
+
+                <div style="display:flex; gap: 10px; margin-top: 10px;">
+    <div class="form-group" style="flex:1;">
+        <label>Nº Trab. Expostos:</label>
+        <input type="number" id="expostos" min="1" required placeholder="Ex: 12">
+    </div>
+    <div class="form-group" style="flex:2;">
+        <label>Requer AEP (Análise Profissional)?</label>
+        <select id="requerAep">
+            <option value="Não">Não (Risco Controlado)</option>
+            <option value="Sim - Psicólogo/Ergonomista">Sim - Encaminhar Especialista</option>
+        </select>
+    </div>
+</div>
+
+            </form>
+        </div>
+    </div>
+
+   
+
+    
+    <script>
+        function carregarFatoresNoSelect() {
+            const select = document.getElementById('perigoSelect');
+            const fatores = JSON.parse(localStorage.getItem('psi_gro_fatores')) || [];
+            
+            select.innerHTML = '<option value="">Selecione um fator...</option>';
+            fatores.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = `${f.icone}|${f.nome}`; 
+                opt.innerText = `${f.icone} ${f.nome}`;
+                select.appendChild(opt);
+            });
+        }
+    </script>
+
+
+<!-- Modal de Edição de Risco -->
+<div class="modal-overlay" id="modalEditarRisco">
+    <div class="modal-content" style="width: 600px;"> <!-- Deixei mais largo para caber os textos -->
+        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-pencil"></i> Editar Avaliação de Risco e Plano de Ação</h3>
+        <form id="formEditarRisco" onsubmit="salvarEdicaoRisco(event)">
+            <input type="hidden" id="editId">
+            
+            <div class="form-group">
+                <label>Fator de Risco / Perigo (Bloqueado para edição):</label>
+                <!-- READONLY adicionado para bloquear a edição e fundo cinza para indicar o bloqueio -->
+                <input type="text" id="editPerigo" readonly style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed; font-size: 0.85rem;">
+            </div>
+            
+            <div style="display:flex; gap: 10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Probabilidade (P):</label>
+                    <input type="number" id="editProb" min="1" max="5" required>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Severidade (S):</label>
+                    <input type="number" id="editSev" min="1" max="5" required>
+                </div>
+            </div>
+
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+            <h4 style="margin-bottom: 10px; font-size: 0.95rem; color: var(--sidebar-bg);"><i class="fa-solid fa-clipboard-check"></i> Plano de Ação (NR-1)</h4>
+            
+            <div class="form-group">
+                <label>Medida de Prevenção a ser adotada:</label>
+                <input type="text" id="editAcao" required placeholder="Ex: Estabelecer canais anônimos de escuta">
+            </div>
+
+            <div style="display:flex; gap: 10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Setores Envolvidos na Solução:</label>
+                    <input type="text" id="editSetoresEnv" placeholder="Ex: RH, Diretoria e SESMT" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Responsabilidades (O que cada setor fará?):</label>
+                <textarea id="editResp" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit;" placeholder="Ex: RH - Criar o canal; SESMT - Monitorar dados semanais." required></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-primary btn-outline" onclick="fecharModalEdicao()">Cancelar</button>
+                <button type="submit" class="btn-primary"><i class="fa-solid fa-save"></i> Salvar Revisão e Ação</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+ <script src="js-cerebro.js"></script>
+    <script src="js-inventario.js"></script>
+</body>
+</html>

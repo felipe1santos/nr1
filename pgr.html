@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGR - Sistema NR1</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Paleta Engenharia Profissional */
+            --text-dark: #111827;     
+            --text-muted: #4B5563;    
+            --bg-grey: #F3F4F6;       
+            --bg-dark-grey: #E5E7EB;
+            --border-color: #4B5563;  /* Cinza escuro para bordas mais marcantes */
+            
+            /* Destaques (Azul Engenharia) */
+            --blue-data: #1D4ED8;     
+            
+            /* Matriz de Risco */
+            --risk-low: #059669;
+            --risk-med: #D97706;
+            --risk-high: #DC2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: #d1d5db; /* Fundo escuro para destacar as folhas brancas na tela */
+            line-height: 1.4;
+            font-size: 11px;
+        }
+
+        /* Estrutura de Página A4 */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #fff;
+            margin: 15mm auto;
+            padding: 15mm 15mm 25mm 15mm;
+            position: relative;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #9CA3AF;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* TIPOGRAFIA E DESTAQUES */
+        .data-highlight {
+            color: var(--blue-data);
+            font-weight: 700;
+            font-style: italic;
+        }
+        
+        h3.section-title {
+            font-size: 13px;
+            color: var(--text-dark);
+            background-color: var(--bg-grey);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            margin: 20px 0 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* CABEÇALHO DO DOCUMENTO (ESTILO MEMÓRIA DE CÁLCULO) */
+        .doc-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+        }
+        .doc-header-table th, .doc-header-table td {
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            text-align: left;
+        }
+        .doc-header-table th {
+            background-color: var(--bg-grey);
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: none;
+        }
+        .doc-header-table td {
+            font-size: 12px;
+            font-weight: 700;
+            border-top: none;
+            padding-bottom: 8px;
+        }
+        .doc-header-table .logo-cell {
+            width: 25%;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .doc-header-table .logo-cell img, .logo-placeholder {
+            max-height: 40px;
+            font-size: 14px;
+            color: var(--border-color);
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        /* TABELAS GERAIS DE DADOS */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            border: 2px solid var(--border-color);
+        }
+        table.data-table th, table.data-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            vertical-align: middle;
+        }
+        table.data-table th {
+            background-color: var(--bg-grey);
+            color: var(--text-dark);
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        table.data-table td { 
+            font-size: 10.5px; 
+        }
+        .center { text-align: center; }
+
+        /* ÍCONE HUMANO SVG */
+        .icon-human {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--blue-data);
+            font-weight: 800;
+            font-size: 14px;
+        }
+        .icon-human svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* GRADES DE INFORMAÇÃO (Página 2) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .info-box {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .info-box span.label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .info-box span.value { font-size: 12px; font-weight: 700; }
+
+        /* DASHBOARD */
+        .stats-container { display: flex; gap: 20px; margin-bottom: 20px; page-break-inside: avoid; }
+        .chart-box { flex: 1; border: 2px solid var(--border-color); padding: 15px; background: #fff; }
+
+        /* PARECER E OBSERVAÇÕES */
+        .observation-box {
+            border: 2px solid var(--border-color);
+            display: flex;
+            page-break-inside: avoid;
+            margin-top: 15px;
+        }
+        .obs-title {
+            background-color: var(--bg-dark-grey);
+            color: var(--text-dark);
+            font-weight: 800;
+            padding: 10px;
+            width: 25%;
+            border-right: 2px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+        .obs-content {
+            padding: 15px;
+            width: 75%;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* ASSINATURAS */
+        .signature-area { display: flex; justify-content: space-around; margin-top: 60px; page-break-inside: avoid; }
+        .signature-line { width: 40%; border-top: 1px solid var(--text-dark); text-align: center; padding-top: 6px; font-size: 10px; font-weight: 600; }
+
+        /* RODAPÉ PADRÃO */
+        .pgr-footer {
+            position: absolute;
+            bottom: 8mm;
+            left: 15mm;
+            right: 15mm;
+            border-top: 2px solid var(--border-color);
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* CAPA ESPECÍFICA */
+        .cover-title-area { text-align: center; margin: auto 0; }
+        .cover-title-area h1 { font-size: 34px; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: 800; }
+        .cover-title-area h2 { font-size: 16px; color: var(--text-muted); font-weight: 600; margin-bottom: 40px; }
+        
+        @media print {
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; border: none; padding: 15mm; }
+            .pgr-footer { bottom: 5mm; left: 15mm; right: 15mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+        <table class="doc-header-table" style="margin-bottom: auto;">
+            <tr>
+                <td rowspan="2" class="logo-cell"><div class="logo-placeholder">LOGOMARCA</div></td>
+                <th style="width: 50%;">CLIENTE:</th>
+                <th style="width: 25%;">CNPJ:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight" style="font-size: 14px;">INDÚSTRIA EXEMPLO S/A</td>
+                <td class="data-highlight">00.000.000/0001-00</td>
+            </tr>
+        </table>
+        
+        <div class="cover-title-area">
+            <h1>Programa de Gerenciamento<br>de Riscos (PGR)</h1>
+            <h2>Inventário de Riscos e Plano de Ação - Base legal: NR-01</h2>
+            
+            <div style="margin-top: 50px;">
+                <p style="font-size: 12px; margin-bottom: 5px;">CÓDIGO DO DOCUMENTO:</p>
+                <p class="data-highlight" style="font-size: 18px;">PGR-042-2026</p>
+                
+                <br><br>
+                <p style="font-size: 12px; margin-bottom: 5px;">DATA DE EMISSÃO / VALIDADE:</p>
+                <p class="data-highlight" style="font-size: 14px;">05/04/2026 até 05/04/2028</p>
+            </div>
+        </div>
+
+        <div class="observation-box" style="margin-top: auto;">
+            <div class="obs-title" style="width: 30%;">ELABORAÇÃO TÉCNICA</div>
+            <div class="obs-content" style="width: 70%;">
+                <strong>Eng. de Segurança do Trabalho</strong><br>
+                CREA: <span class="data-highlight">ES-123456/D</span><br>
+                ART: <span class="data-highlight">000000000000</span>
+            </div>
+        </div>
+
+        <div class="pgr-footer">
+            <div>SISTEMA: NR1SISTEMA.COM.BR</div>
+            <div>AV. PARQUE INDUSTRIAL, 1000 - CIDADE/UF</div>
+            <div>PÁGINA 1 DE 5</div>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="doc-header-table">
+            <tr>
+                <th style="width: 50%;">CLIENTE:</th>
+                <th style="width: 25%;">DOCUMENTO Nº:</th>
+                <th style="width: 25%;">DATA DE EMISSÃO:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">INDÚSTRIA EXEMPLO S/A</td>
+                <td class="data-highlight">PGR-042-2026</td>
+                <td class="data-highlight">05/04/2026</td>
+            </tr>
+            <tr>
+                <th>DESCRIÇÃO DO DOCUMENTO:</th>
+                <th>CÓDIGO / NORMA DE REFERÊNCIA:</th>
+                <th>FOLHA:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">IDENTIFICAÇÃO E MAPEAMENTO</td>
+                <td class="data-highlight">NR-01 GRO / PGR</td>
+                <td class="data-highlight">02 DE 05</td>
+            </tr>
+        </table>
+
+        <h3 class="section-title">1. Dados da Organização</h3>
+        <div class="info-grid">
+            <div class="info-box">
+                <span class="label">Razão Social</span>
+                <span class="value data-highlight">Indústria Exemplo de Manufatura S/A</span>
+            </div>
+            <div class="info-box">
+                <span class="label">CNAE Principal / Grau de Risco</span>
+                <span class="value"><span class="data-highlight">25.39-0-01</span> - Usinagem | Grau: <span class="data-highlight">3</span></span>
+            </div>
+            <div class="info-box">
+                <span class="label">Endereço do Estabelecimento</span>
+                <span class="value data-highlight">Av. Parque Industrial, 1000, Distrito Industrial</span>
+            </div>
+            <div class="info-box">
+                <span class="label">Efetivo Operacional Total</span>
+                <span class="value icon-human">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    142 Trabalhadores Ativos
+                </span>
+            </div>
+        </div>
+
+        <h3 class="section-title">2. Síntese de Exposição por Setor</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Setor / Área</th>
+                    <th>Efetivo</th>
+                    <th>Agentes Predominantes</th>
+                    <th>Nível de Risco Geral</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Usinagem Pesada</strong></td>
+                    <td class="center"><span class="data-highlight">45</span></td>
+                    <td>Ruído Contínuo, Prensamento, Óleos Minerais</td>
+                    <td class="center" style="color: var(--risk-high); font-weight: bold;">ALTO</td>
+                </tr>
+                <tr>
+                    <td><strong>Cabines de Pintura</strong></td>
+                    <td class="center"><span class="data-highlight">18</span></td>
+                    <td>Vapores Orgânicos (Tolueno/Xileno)</td>
+                    <td class="center" style="color: var(--risk-high); font-weight: bold;">ALTO</td>
+                </tr>
+                <tr>
+                    <td><strong>Expedição e Logística</strong></td>
+                    <td class="center"><span class="data-highlight">35</span></td>
+                    <td>Levantamento Manual de Cargas</td>
+                    <td class="center" style="color: var(--risk-med); font-weight: bold;">MÉDIO</td>
+                </tr>
+                <tr>
+                    <td><strong>Administrativo</strong></td>
+                    <td class="center"><span class="data-highlight">44</span></td>
+                    <td>Postura Estática, Iluminação</td>
+                    <td class="center" style="color: var(--risk-low); font-weight: bold;">BAIXO</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="section-title">3. Distribuição e Classificação de Riscos</h3>
+        <div class="stats-container">
+            <div class="chart-box" style="flex: 0.6;">
+                <h4 style="text-align: center; margin-top:0; font-size: 11px; text-transform: uppercase;">Agentes Identificados (%)</h4>
+                <div style="height: 180px;"><canvas id="riskChart"></canvas></div>
+            </div>
+            <div class="chart-box">
+                <h4 style="margin-top:0; font-size: 11px; text-transform: uppercase;">Análise de Conformidade (NR-01)</h4>
+                <p style="text-align: justify; line-height: 1.6;">O mapeamento reflete a avaliação ambiental. Conforme exigência do item 1.5.4.4.6 da NR-01, os riscos classificados como <strong style="color: var(--risk-high);">ALTOS</strong> foram imediatamente inseridos no Plano de Ação para adoção prioritária de medidas de Proteção Coletiva (EPC), substituindo a dependência exclusiva de EPIs.</p>
+            </div>
+        </div>
+
+        <div class="pgr-footer">
+            <div>SISTEMA: NR1SISTEMA.COM.BR</div>
+            <div>AV. PARQUE INDUSTRIAL, 1000 - CIDADE/UF<</div>
+            <div>PÁGINA 2 DE 5</div>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="doc-header-table">
+            <tr>
+                <th style="width: 50%;">CLIENTE:</th>
+                <th style="width: 25%;">DOCUMENTO Nº:</th>
+                <th style="width: 25%;">DATA DE EMISSÃO:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">INDÚSTRIA EXEMPLO S/A</td>
+                <td class="data-highlight">PGR-042-2026</td>
+                <td class="data-highlight">05/04/2026</td>
+            </tr>
+            <tr>
+                <th>DESCRIÇÃO DO DOCUMENTO:</th>
+                <th>CÓDIGO / NORMA DE REFERÊNCIA:</th>
+                <th>FOLHA:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">INVENTÁRIO DE RISCOS (IGRO)</td>
+                <td class="data-highlight">NR-01 GRO / PGR</td>
+                <td class="data-highlight">03 DE 05</td>
+            </tr>
+        </table>
+
+        <h3 class="section-title">4. Inventário de Riscos Ocupacionais</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 12%;">SETOR / EFETIVO</th>
+                    <th style="width: 13%;">PERIGO / AGENTE</th>
+                    <th style="width: 20%;">FONTE GERADORA / DANOS</th>
+                    <th style="width: 20%;">CONTROLES ATUAIS</th>
+                    <th style="width: 25%;">MEDIDAS PREVENTIVAS PROPOSTAS</th>
+                    <th style="width: 10%;">RISCO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="center">
+                        <strong>Usinagem</strong><br><br>
+                        <span class="icon-human">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            45
+                        </span>
+                    </td>
+                    <td><strong>Físico</strong><br>Ruído Contínuo</td>
+                    <td>Atrito de ferramentas (Tornos CNC).<br><br><em>Danos:</em> PAIR, estresse.</td>
+                    <td>EPI: Protetor Concha.<br>ADM: Audiometria.</td>
+                    <td>Instalação de barreiras acústicas parciais conforme NR-12.</td>
+                    <td class="center" style="color: var(--risk-high); font-weight: bold;">ALTO</td>
+                </tr>
+                <tr>
+                    <td class="center">
+                        <strong>Expedição</strong><br><br>
+                        <span class="icon-human">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            35
+                        </span>
+                    </td>
+                    <td><strong>Ergonômico</strong><br>Carga Manual</td>
+                    <td>Levantamento de peças > 25kg.<br><br><em>Danos:</em> Lombalgia.</td>
+                    <td>ADM: Rodízio de atividades.</td>
+                    <td>Aquisição de <span class="data-highlight">02 talhas pneumáticas</span> para elevação.</td>
+                    <td class="center" style="color: var(--risk-med); font-weight: bold;">MÉDIO</td>
+                </tr>
+                 <tr>
+                    <td class="center">
+                        <strong>Pintura</strong><br><br>
+                        <span class="icon-human">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            18
+                        </span>
+                    </td>
+                    <td><strong>Químico</strong><br>Vapores Orgânicos</td>
+                    <td>Pulverização de tintas base solvente.<br><br><em>Danos:</em> Dermatite.</td>
+                    <td>EPC: Exaustão deficiente.</td>
+                    <td>Manutenção corretiva e redimensionamento de exaustão.</td>
+                    <td class="center" style="color: var(--risk-high); font-weight: bold;">ALTO</td>
+                </tr>
+                <tr>
+                    <td class="center">
+                        <strong>Administrativo</strong><br><br>
+                        <span class="icon-human">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            44
+                        </span>
+                    </td>
+                    <td><strong>Ergonômico</strong><br>Postura Estática</td>
+                    <td>Trabalho contínuo em computadores.<br><br><em>Danos:</em> Fadiga visual.</td>
+                    <td>Mobiliário NR-17. Pausas.</td>
+                    <td>Treinamento postural anual.</td>
+                    <td class="center" style="color: var(--risk-low); font-weight: bold;">BAIXO</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="observation-box">
+            <div class="obs-title" style="width: 25%;">COMENTÁRIOS / OBSERVAÇÃO</div>
+            <div class="obs-content" style="width: 75%;">
+                1 – Os riscos classificados como <span class="data-highlight">ALTO</span> demandam intervenção prioritária através de EPCs.<br>
+                2 – O efetivo total mapeado sob risco nas áreas operacionais é de <span class="data-highlight">98 trabalhadores</span> (excluindo administrativo).<br>
+            </div>
+        </div>
+
+        <div class="pgr-footer">
+            <div>SISTEMA: NR1SISTEMA.COM.BR</div>
+            <div>AV. PARQUE INDUSTRIAL, 1000 - CIDADE/UF<</div>
+            <div>PÁGINA 3 DE 5</div>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="doc-header-table">
+            <tr>
+                <th style="width: 50%;">CLIENTE:</th>
+                <th style="width: 25%;">DOCUMENTO Nº:</th>
+                <th style="width: 25%;">DATA DE EMISSÃO:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">INDÚSTRIA EXEMPLO S/A</td>
+                <td class="data-highlight">PGR-042-2026</td>
+                <td class="data-highlight">05/04/2026</td>
+            </tr>
+            <tr>
+                <th>DESCRIÇÃO DO DOCUMENTO:</th>
+                <th>CÓDIGO / NORMA DE REFERÊNCIA:</th>
+                <th>FOLHA:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">PLANO DE AÇÃO</td>
+                <td class="data-highlight">NR-01 GRO / PGR</td>
+                <td class="data-highlight">04 DE 05</td>
+            </tr>
+        </table>
+
+        <h3 class="section-title">5. Plano de Ação (Cronograma)</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">SETOR / RISCO</th>
+                    <th style="width: 35%;">AÇÃO PREVENTIVA / CORRETIVA</th>
+                    <th style="width: 20%;">RESPONSÁVEL</th>
+                    <th style="width: 15%;">PRAZO</th>
+                    <th style="width: 15%;">SITUAÇÃO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Pintura</strong><br>Químico</td>
+                    <td>Manutenção corretiva e redimensionamento do sistema de exaustão localizada (LEVs).</td>
+                    <td>Eng. Manutenção</td>
+                    <td class="center data-highlight">15/06/2026</td>
+                    <td class="center data-highlight">Em Andamento</td>
+                </tr>
+                <tr>
+                    <td><strong>Usinagem</strong><br>Ruído</td>
+                    <td>Instalação de barreiras acústicas parciais e adequação das proteções móveis conforme NR-12.</td>
+                    <td>SESMT</td>
+                    <td class="center data-highlight">30/08/2026</td>
+                    <td class="center data-highlight">Planejado</td>
+                </tr>
+                <tr>
+                    <td><strong>Expedição</strong><br>Ergonômico</td>
+                    <td>Aquisição e instalação de 02 talhas pneumáticas e 04 mesas pantográficas.</td>
+                    <td>Gerência</td>
+                    <td class="center data-highlight">30/10/2026</td>
+                    <td class="center data-highlight">Planejado</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pgr-footer">
+            <div>SISTEMA: NR1SISTEMA.COM.BR</div>
+            <div>AV. PARQUE INDUSTRIAL, 1000 - CIDADE/UF<</div>
+            <div>PÁGINA 4 DE 5</div>
+        </div>
+    </div>
+
+    <div class="page">
+        <table class="doc-header-table">
+            <tr>
+                <th style="width: 50%;">CLIENTE:</th>
+                <th style="width: 25%;">DOCUMENTO Nº:</th>
+                <th style="width: 25%;">DATA DE EMISSÃO:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">INDÚSTRIA EXEMPLO S/A</td>
+                <td class="data-highlight">PGR-042-2026</td>
+                <td class="data-highlight">05/04/2026</td>
+            </tr>
+            <tr>
+                <th>DESCRIÇÃO DO DOCUMENTO:</th>
+                <th>CÓDIGO / NORMA DE REFERÊNCIA:</th>
+                <th>FOLHA:</th>
+            </tr>
+            <tr>
+                <td class="data-highlight">PARECER TÉCNICO E ASSINATURAS</td>
+                <td class="data-highlight">NR-01 GRO / PGR</td>
+                <td class="data-highlight">05 DE 05</td>
+            </tr>
+        </table>
+
+        <h3 class="section-title">6. Parecer Técnico Conclusivo</h3>
+        <div class="observation-box">
+            <div class="obs-title">CONCLUSÃO TÉCNICA</div>
+            <div class="obs-content">
+                O presente Programa de Gerenciamento de Riscos (PGR) foi elaborado com base nas legislações vigentes. O cumprimento integral do Plano de Ação é de responsabilidade da Alta Direção da empresa.<br><br>
+                A avaliação de riscos deve ser revista a cada <span class="data-highlight">2 (dois) anos</span> ou em caso de modificações tecnológicas, acidentes ou inovações nos processos de trabalho, conforme item 1.5.4.4.6 da Norma Regulamentadora nº 01.<br><br>
+                <em>Documento gerado digitalmente em <span class="data-highlight">05/04/2026</span>.</em>
+            </div>
+        </div>
+
+        <div class="signature-area">
+            <div class="signature-line">
+                <strong>RESPONSÁVEL TÉCNICO (SESMT)</strong><br>
+                Engenheiro de Segurança do Trabalho<br>
+                CREA / Registro MTE
+            </div>
+            <div class="signature-line">
+                <strong>REPRESENTANTE LEGAL</strong><br>
+                Diretoria de Operações<br>
+                INDÚSTRIA EXEMPLO S/A
+            </div>
+        </div>
+
+        <div class="pgr-footer">
+            <div>SISTEMA: NR1SISTEMA.COM.BR</div>
+            <div>AV. PARQUE INDUSTRIAL, 1000 - CIDADE/UF<</div>
+            <div>PÁGINA 5 DE 5</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Físicos', 'Químicos', 'Ergonômicos', 'Acidentes'],
+                    datasets: [{
+                        data: [40, 20, 25, 15],
+                        backgroundColor: ['#4B5563', '#9CA3AF', '#D1D5DB', '#1D4ED8'], /* Cores da paleta de engenharia, destaque azul */
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10, family: 'Inter', weight: 'bold' }, color: '#111827' } }
+                    },
+                    cutout: '65%'
+                }
+            });
+        });
+    </script>
+</body>
+</html>

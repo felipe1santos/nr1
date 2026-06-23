@@ -1,0 +1,47 @@
+/* =========================================
+   CSS ESPECÍFICO DO INVENTÁRIO DE RISCOS
+   ========================================= */
+
+.card-setor {
+    border: 1px solid var(--border);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card-setor:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.card-setor-header {
+    cursor: pointer;
+}
+
+.card-setor-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.seta-collapse {
+    color: var(--text-light);
+    transition: transform 0.3s ease-in-out;
+}
+
+.card-setor-header:not(.collapsed) .seta-collapse {
+    transform: rotate(180deg);
+}
+
+.fatores-risco-container {
+    background-color: #f8fafc;
+}
+
+.fator-risco-item {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.fator-risco-item i {
+    width: 25px;
+    text-align: center;
+}
+
+#mini-dashboard-inventario {
+    border: 1px solid var(--border);
+}
