@@ -48,6 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (toggleBtn && sidebar) {
         toggleBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
     }
+
+    // Mostra o nome do usuário logado no topo, conforme quem acessou
+    const nomeEl = document.getElementById('userNameDisplay');
+    if (nomeEl) {
+        const email = localStorage.getItem('psi_gro_email_logado') || '';
+        let nome = email.split('@')[0];                 // pega parte antes do @
+        nome = nome.charAt(0).toUpperCase() + nome.slice(1); // primeira letra maiúscula
+        nomeEl.textContent = 'Gestor | ' + (nome || 'Usuário');
+    }
 });
 
 
